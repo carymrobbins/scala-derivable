@@ -19,6 +19,9 @@ object GenericList {
 
   def tail[A, T](a: A)(implicit ev: GL[A, _, T]): T = ev.tail(a)
 
+  implicit def ctor[C <: GenericCtor, H, T](implicit ev: GL[C#_GenFields, H, T]): GL[C, H, T]
+    = ev.asInstanceOf[GL[C, H, T]]
+
   private val _gf1: GL[GF._1[Any], Any, GF._0] = instance(_._genArg_1)
   implicit def gf1[A]: GL[GF._1[A], A, GF._0] = _gf1.asInstanceOf[GL[GF._1[A], A, GF._0]]
 

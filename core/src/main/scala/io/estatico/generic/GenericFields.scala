@@ -5,9 +5,6 @@ trait GenericCtor {
 }
 
 object GenericCtor {
-
-  implicit def toGenFields[C <: GenericCtor](c: C): C#_GenFields = c.asInstanceOf[C#_GenFields]
-
   trait Aux[F] extends GenericCtor { override final type _GenFields = F }
   trait _0 extends Aux[GenericFields._0] with GenericFields._0
   trait _1[A] extends Aux[GenericFields._1[A]] with GenericFields._1[A]

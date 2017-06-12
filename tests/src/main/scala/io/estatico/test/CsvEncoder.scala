@@ -37,9 +37,9 @@ object CsvEncoderInstances extends CsvEncoderInstances
 
 final class CsvEncoderDeriver[C]
 object CsvEncoderDeriver {
-  implicit def derive[C <: GenericCtor, H, T](c: CsvEncoderDeriver[C])(
+  implicit def derive[C, H, T](c: CsvEncoderDeriver[C])(
     implicit
-    gl: GenericList[C#_GenFields, H, T],
+    gl: GenericList[C, H, T],
     hEnc: CsvEncoder[H],
     tEnc: CsvEncoder[T]
   ): CsvEncoder[C] = CsvEncoder.instance(a =>
