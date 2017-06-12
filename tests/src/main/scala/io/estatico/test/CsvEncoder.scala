@@ -16,24 +16,22 @@ object CsvEncoder {
 
   def fromToString[A]: CsvEncoder[A] = _fromToString.asInstanceOf[CsvEncoder[A]]
 
+  // Cached instance for all fromToString instances.
+  private val _fromToString = CsvEncoder.instance[Any](_.toString)
+
   def derive[C]: CsvEncoderDeriver[C] = new CsvEncoderDeriver[C]
 
-  private val _fromToString = CsvEncoder.instance[Any](_.toString)
-}
+  implicit val int: CsvEncoder[Int] = CsvEncoder.fromToString
 
-trait CsvEncoderInstances {
+  implicit val float: CsvEncoder[Float] = CsvEncoder.fromToString
 
-  implicit val csvEncInt: CsvEncoder[Int] = CsvEncoder.fromToString
-
-  implicit val csvEncString: CsvEncoder[String] = CsvEncoder.instance(s =>
+  implicit val string: CsvEncoder[String] = CsvEncoder.instance(s =>
     if (s.contains(',')) '"' + s.replace("\"", "\"\"") + '"' else s
   )
 
-  implicit def csvEncGFields1[A](implicit aEnc: CsvEncoder[A]): CsvEncoder[GenericFields._1[A]]
+  implicit def gFields1[A](implicit aEnc: CsvEncoder[A]): CsvEncoder[GenericFields._1[A]]
     = CsvEncoder.instance(a => aEnc.encode(GenericList.head(a)))
 }
-
-object CsvEncoderInstances extends CsvEncoderInstances
 
 final class CsvEncoderDeriver[C]
 object CsvEncoderDeriver {

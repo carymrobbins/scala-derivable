@@ -3,21 +3,19 @@ package io.estatico.generic
 import io.estatico.test._
 import org.scalatest.{FlatSpec, Matchers}
 
-class GenericCtorsTest extends FlatSpec with Matchers {
+class GenericProductTest extends FlatSpec with Matchers {
 
-  import GenericCtorsTest._
+  import GenericProductTest._
 
   "CsvEncoder" should "be derivable" in {
     CsvEncoder[ExampleCase].encode(ExampleCase("foo", 3)) shouldEqual "foo,3"
   }
 }
 
-object GenericCtorsTest {
+object GenericProductTest {
 
   @GenericProduct
   case class ExampleCase(a: String, b: Int)
-
-  import CsvEncoderInstances._
 
   implicit val csvEncEx: CsvEncoder[ExampleCase] = CsvEncoder.derive[ExampleCase]
 }
