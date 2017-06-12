@@ -14,12 +14,8 @@ class GenericCtorsTest extends FlatSpec with Matchers {
 
 object GenericCtorsTest {
 
-  // TODO: Add a @generic annotation for generating inheritance
+  @GenericProduct
   case class ExampleCase(a: String, b: Int)
-    extends GenericCtor._2[String, Int] {
-    override def _genArg_2 = a
-    override def _genArg_1 = b
-  }
 
   import CsvEncoderInstances._
 
