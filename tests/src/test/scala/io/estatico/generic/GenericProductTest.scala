@@ -8,7 +8,7 @@ class GenericProductTest extends FlatSpec with Matchers {
   import GenericProductTest._
 
   "CsvEncoder" should "be derivable" in {
-    //CsvEncoder.encode(Example1("blah")) shouldEqual "blah"
+    CsvEncoder.encode(Example1("blah")) shouldEqual "blah"
     CsvEncoder.encode(Example2("foo", 3)) shouldEqual "foo,3"
     CsvEncoder.encode(Example3("hey", 4, 5.2f)) shouldEqual "hey,4,5.2"
     CsvEncoder.encode(Example4("ya", 2, 8.2f, 7.6)) shouldEqual "ya,2,8.2,7.6"
@@ -17,9 +17,9 @@ class GenericProductTest extends FlatSpec with Matchers {
 
 object GenericProductTest {
 
-  //@DeriveGeneric
-  //case class Example1(a: String)
-  //implicit val csvEncEx1: CsvEncoder[Example1] = CsvEncoder.derive[Example1]
+  @DeriveGeneric
+  case class Example1(a: String)
+  implicit val csvEncEx1: CsvEncoder[Example1] = CsvEncoder.derive[Example1]
 
   @DeriveGeneric
   case class Example2(a: String, b: Int)

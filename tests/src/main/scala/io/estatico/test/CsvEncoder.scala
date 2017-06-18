@@ -66,12 +66,25 @@ object CsvEncoder {
   type Derived[A] = CsvEncoder[A] with DerivedTag
   trait DerivedTag
   object DerivedTag {
-    implicit def derived[A, H, T <: GList](
+
+    /** For products with arity == 1 */
+    implicit def derivedGSingle[A, H](
+      implicit
+      gProd: GProduct.Aux[A, H #: GNil],
+      isGNel: IsGNel.Aux[A, H, GNil],
+      hEnc: CsvEncoder[H]
+    ): Derived[A] = cast(gSingle[A, H])
+
+    /** For products with arity >= 2 */
+    implicit def derivedGNel[A, H, T <: GList](
       implicit
       gProd: GProduct.Aux[A, H #: T],
       isGNel: IsGNel.Aux[A, H, T],
       hEnc: CsvEncoder[H],
       tEnc: CsvEncoder[GList.Of[A, T]]
-    ): Derived[A] = gProduct[A, H, T].asInstanceOf[Derived[A]]
+    ): Derived[A] = cast(gProduct[A, H, T])
+
+
+    def cast[A, AA <: A](x: CsvEncoder[AA]): Derived[A] = x.asInstanceOf[Derived[A]]
   }
 }
