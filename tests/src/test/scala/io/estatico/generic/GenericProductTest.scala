@@ -31,7 +31,7 @@ object GenericProductTest {
 
   implicit val gProdEx2: GProduct.Aux[Example2, String #: Int #: GNil] = GProduct.instance
 
-  implicit val csvEncEx2: CsvEncoder[Example2] = CsvEncoder.gProduct[Example2, String, Int #: GNil]
+  implicit val csvEncEx2: CsvEncoder[Example2] = CsvEncoder.derive[Example2]
 
   case class Example3(a: String, b: Int, c: Float)
 

@@ -8,6 +8,8 @@ object GProduct {
 
   type Aux[A, R] = GProduct[A] { type Repr = R }
 
+  type Nel[A, H, T <: GList] = GProduct[A] { type Repr = H #: T }
+
   def apply[A](implicit ev: GProduct[A]): Aux[A, ev.Repr] = ev
 
   def instance[A, R]: Aux[A, R] = _instance.asInstanceOf[Aux[A, R]]

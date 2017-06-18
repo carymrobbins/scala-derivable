@@ -21,8 +21,6 @@ object CsvEncoder {
   // Cached instance for all fromToString instances.
   private val _fromToString = CsvEncoder.instance[Any](_.toString)
 
-  def derive[A]: CsvEncoderDeriver[A] = new CsvEncoderDeriver[A]
-
   implicit val int: CsvEncoder[Int] = CsvEncoder.fromToString
 
   implicit val float: CsvEncoder[Float] = CsvEncoder.fromToString
@@ -62,14 +60,18 @@ object CsvEncoder {
   ): CsvEncoder[GList.Of[A, H #: GNil]] = CsvEncoder.instance { nel =>
     hEnc.encode(isGNel.head(nel))
   }
-}
 
-final class CsvEncoderDeriver[A] {
-  def apply[H, T <: GList](
-    implicit
-    gProd: GProduct.Aux[A, H #: T],
-    isGNel: IsGNel.Aux[A, H, T],
-    hEnc: CsvEncoder[H],
-    tEnc: CsvEncoder[GList.Of[A, T]]
-  ): CsvEncoder[A] = CsvEncoder.gProduct[A, H, T]
+  def derive[A](implicit ev: Derived[A]): CsvEncoder[A] = ev
+
+  type Derived[A] = CsvEncoder[A] with DerivedTag
+  trait DerivedTag
+  object DerivedTag {
+    implicit def derived[A, H, T <: GList](
+      implicit
+      gProd: GProduct.Aux[A, H #: T],
+      isGNel: IsGNel.Aux[A, H, T],
+      hEnc: CsvEncoder[H],
+      tEnc: CsvEncoder[GList.Of[A, T]]
+    ): Derived[A] = gProduct[A, H, T].asInstanceOf[Derived[A]]
+  }
 }
