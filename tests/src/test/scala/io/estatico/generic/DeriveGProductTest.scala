@@ -3,9 +3,9 @@ package io.estatico.generic
 import io.estatico.test._
 import org.scalatest.{FlatSpec, Matchers}
 
-class GenericProductTest extends FlatSpec with Matchers {
+class DeriveGProductTest extends FlatSpec with Matchers {
 
-  import GenericProductTest._
+  import DeriveGProductTest._
 
   "CsvEncoder" should "be derivable" in {
     CsvEncoder.encode(Example1("blah")) shouldEqual "blah"
@@ -26,22 +26,22 @@ class GenericProductTest extends FlatSpec with Matchers {
   }
 }
 
-object GenericProductTest {
+object DeriveGProductTest {
 
-  @DeriveGeneric case class Example1(a: String)
+  @DeriveGProduct case class Example1(a: String)
   implicit val csvEncEx1: CsvEncoder[Example1] = CsvEncoder.derive[Example1]
 
-  @DeriveGeneric case class Example2(a: String, b: Int)
+  @DeriveGProduct case class Example2(a: String, b: Int)
   implicit val csvEncEx2: CsvEncoder[Example2] = CsvEncoder.derive[Example2]
 
-  @DeriveGeneric case class Example3(a: String, b: Int, c: Float)
+  @DeriveGProduct case class Example3(a: String, b: Int, c: Float)
   implicit val csvEncEx3: CsvEncoder[Example3] = CsvEncoder.derive[Example3]
 
-  @DeriveGeneric case class Example4(a: String, b: Int, c: Float, d: Double)
+  @DeriveGProduct case class Example4(a: String, b: Int, c: Float, d: Double)
   implicit val csvEncEx4: CsvEncoder[Example4] = CsvEncoder.derive[Example4]
 
-  @DeriveGeneric case class NoExample1(a: String)
-  @DeriveGeneric case class NoExample2(a: String, b: Int)
-  @DeriveGeneric case class NoExample3(a: String, b: Int, c: Float)
-  @DeriveGeneric case class NoExample4(a: String, b: Int, c: Float, d: Double)
+  @DeriveGProduct case class NoExample1(a: String)
+  @DeriveGProduct case class NoExample2(a: String, b: Int)
+  @DeriveGProduct case class NoExample3(a: String, b: Int, c: Float)
+  @DeriveGProduct case class NoExample4(a: String, b: Int, c: Float, d: Double)
 }

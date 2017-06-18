@@ -3,12 +3,12 @@ package io.estatico.generic
 import scala.annotation.StaticAnnotation
 import scala.reflect.macros.blackbox
 
-class DeriveGeneric extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro DeriveGenericMacros.impl
+class DeriveGProduct extends StaticAnnotation {
+  def macroTransform(annottees: Any*): Any = macro DeriveGProductMacros.impl
 }
 
 @macrocompat.bundle
-private[generic] final class DeriveGenericMacros(val c: blackbox.Context) {
+private[generic] final class DeriveGProductMacros(val c: blackbox.Context) {
 
   import c.universe._
 
