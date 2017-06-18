@@ -21,6 +21,8 @@ object CsvEncoder {
   // Cached instance for all fromToString instances.
   private val _fromToString = CsvEncoder.instance[Any](_.toString)
 
+  def derive[A]: CsvEncoderDeriver[A] = new CsvEncoderDeriver[A]
+
   implicit val int: CsvEncoder[Int] = CsvEncoder.fromToString
 
   implicit val float: CsvEncoder[Float] = CsvEncoder.fromToString
@@ -31,26 +33,43 @@ object CsvEncoder {
     if (s.contains(',')) '"' + s.replace("\"", "\"\"") + '"' else s
   )
 
-  implicit def gFields1[A](implicit aEnc: CsvEncoder[A]): CsvEncoder[GenericFields._1[A]]
-    = CsvEncoder.instance(a => aEnc.encode(GenericList.head(a)))
-
-  implicit def generic[A, H, T](
+  def gProduct[A, H, T <: GList](
     implicit
-    gl: GenericList[A, H, T],
+    gProd: GProduct.Aux[A, H #: T],
+    isGNel: IsGNel.Aux[A, H, T],
     hEnc: CsvEncoder[H],
-    tEnc: CsvEncoder[T]
+    tEnc: CsvEncoder[GList.Of[A, T]]
   ): CsvEncoder[A] = CsvEncoder.instance(a =>
-    hEnc.encode(gl.head(a)) + ',' + tEnc.encode(gl.tail(a))
+    gNel[A, H, T].encode(GProduct.to[A](a))
   )
 
-  implicit def derive[C] = new CsvEncoderDeriver[C]
+  implicit def gNel[A, H, T <: GList](
+    implicit
+    hEnc: CsvEncoder[H],
+    tEnc: CsvEncoder[GList.Of[A, T]],
+    isGNel: IsGNel.Aux[A, H, T]
+  ): CsvEncoder[GList.Of[A, H #: T]] = CsvEncoder.instance { a =>
+    //TODO: See if this will work
+    //import IsGNel.ops._
+    //hEnc.encode(nel.head) + ',' + tEnc.encode(nel.tail)
+    hEnc.encode(isGNel.head(a)) + ',' + tEnc.encode(isGNel.tail(a))
+  }
+
+  implicit def gSingle[A, H](
+    implicit
+    hEnc: CsvEncoder[H],
+    isGNel: IsGNel.Aux[A, H, GNil]
+  ): CsvEncoder[GList.Of[A, H #: GNil]] = CsvEncoder.instance { nel =>
+    hEnc.encode(isGNel.head(nel))
+  }
 }
 
-final class CsvEncoderDeriver[C] {
-  def apply[H, T]()(
+final class CsvEncoderDeriver[A] {
+  def apply[H, T <: GList](
     implicit
-    gl: GenericList[C, H, T],
+    gProd: GProduct.Aux[A, H #: T],
+    isGNel: IsGNel.Aux[A, H, T],
     hEnc: CsvEncoder[H],
-    tEnc: CsvEncoder[T]
-  ): CsvEncoder[C] = CsvEncoder.generic[C, H, T]
+    tEnc: CsvEncoder[GList.Of[A, T]]
+  ): CsvEncoder[A] = CsvEncoder.gProduct[A, H, T]
 }
