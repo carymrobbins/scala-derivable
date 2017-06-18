@@ -13,25 +13,35 @@ class GenericProductTest extends FlatSpec with Matchers {
     CsvEncoder.encode(Example3("hey", 4, 5.2f)) shouldEqual "hey,4,5.2"
     CsvEncoder.encode(Example4("ya", 2, 8.2f, 7.6)) shouldEqual "ya,2,8.2,7.6"
   }
+
+  it should "not auto-derive" in {
+    assertCompiles("CsvEncoder[Example1]")
+    assertCompiles("CsvEncoder[Example2]")
+    assertCompiles("CsvEncoder[Example3]")
+    assertCompiles("CsvEncoder[Example4]")
+    assertDoesNotCompile("CsvEncoder[NoExample1]")
+    assertDoesNotCompile("CsvEncoder[NoExample2]")
+    assertDoesNotCompile("CsvEncoder[NoExample3]")
+    assertDoesNotCompile("CsvEncoder[NoExample4]")
+  }
 }
 
 object GenericProductTest {
 
-  @DeriveGeneric
-  case class Example1(a: String)
+  @DeriveGeneric case class Example1(a: String)
   implicit val csvEncEx1: CsvEncoder[Example1] = CsvEncoder.derive[Example1]
 
-  @DeriveGeneric
-  case class Example2(a: String, b: Int)
+  @DeriveGeneric case class Example2(a: String, b: Int)
   implicit val csvEncEx2: CsvEncoder[Example2] = CsvEncoder.derive[Example2]
 
-  @DeriveGeneric
-  case class Example3(a: String, b: Int, c: Float)
+  @DeriveGeneric case class Example3(a: String, b: Int, c: Float)
   implicit val csvEncEx3: CsvEncoder[Example3] = CsvEncoder.derive[Example3]
 
-  @DeriveGeneric
-  case class Example4(a: String, b: Int, c: Float, d: Double)
+  @DeriveGeneric case class Example4(a: String, b: Int, c: Float, d: Double)
   implicit val csvEncEx4: CsvEncoder[Example4] = CsvEncoder.derive[Example4]
 
-  case class NoExample2(a: String, b: Int)
+  @DeriveGeneric case class NoExample1(a: String)
+  @DeriveGeneric case class NoExample2(a: String, b: Int)
+  @DeriveGeneric case class NoExample3(a: String, b: Int, c: Float)
+  @DeriveGeneric case class NoExample4(a: String, b: Int, c: Float, d: Double)
 }
