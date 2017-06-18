@@ -1,6 +1,7 @@
 package io.estatico.test
 
 import io.estatico.generic._
+import io.estatico.generic.IsGNel.ops._
 
 trait CsvEncoder[A] {
   def encode(a: A): String
@@ -47,10 +48,7 @@ object CsvEncoder {
     tEnc: CsvEncoder[GList.Of[A, T]],
     isGNel: IsGNel.Aux[A, H, T]
   ): CsvEncoder[GList.Of[A, H #: T]] = CsvEncoder.instance { a =>
-    //TODO: See if this will work
-    //import IsGNel.ops._
-    //hEnc.encode(nel.head) + ',' + tEnc.encode(nel.tail)
-    hEnc.encode(isGNel.head(a)) + ',' + tEnc.encode(isGNel.tail(a))
+    hEnc.encode(a.head) + ',' + tEnc.encode(a.tail)
   }
 
   implicit def gSingle[A, H](

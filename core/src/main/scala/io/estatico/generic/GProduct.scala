@@ -50,11 +50,20 @@ object IsGNel {
   }
 
   object ops {
-    implicit final class IsGNelOps[A, H, T <: GList](
-      val repr: GList.Of[A, H #: T]
-    ) extends AnyVal {
-      def head(implicit ev: Aux[A, H, T]): H = ev.head(repr)
-      def tail(implicit ev: Aux[A, H, T]): T = ev.tail(repr)
+
+    /**
+     * Type inference is weird when extending methods for A, so we have to do some type param trickery
+     * with implicit ev to obtain the appropriate type params.
+     */
+    implicit final class IsGNelOps[A](val repr: A) extends AnyVal {
+
+      def head[AA, H, T <: GList](
+        implicit isGNel: Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
+      ): H = isGNel.head(ev(repr))
+
+      def tail[AA, H, T <: GList](
+        implicit isGNel: Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
+      ): GList.Of[AA, T] = isGNel.tail(ev(repr))
     }
   }
 }
