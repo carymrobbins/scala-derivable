@@ -2,8 +2,6 @@ lazy val derivable = applyDefaultSettings(project.in(file(".")))
   .aggregate(core, tests)
 
 lazy val core = module("core")
-  .settings(sourceGenerators in Compile += (sourceManaged in Compile).map(SourceGen.gen).taskValue)
-  .settings(includedGeneratedSources)
 
 lazy val tests = module("tests").dependsOn(core)
 
@@ -52,14 +50,4 @@ def module(path: String) = {
     moduleName := "derivable-" + path,
     description := "derivable" + docName
   )
-}
-
-// Adapted from https://github.com/typelevel/cats/blob/master/build.sbt
-lazy val includedGeneratedSources: Setting[_] = {
-  mappings in (Compile, packageSrc) ++= {
-    val base = (sourceManaged in Compile).value
-    (managedSources in Compile).value.map { file =>
-      file -> file.relativeTo(base).get.getPath
-    }
-  }
 }
