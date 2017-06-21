@@ -3,7 +3,12 @@ lazy val derivable = applyDefaultSettings(project.in(file(".")))
 
 lazy val core = module("core")
 
-lazy val tests = module("tests").dependsOn(core)
+lazy val tests = module("tests")
+  .settings(
+    libraryDependencies ++= Seq(
+      "io.circe" %% "circe-core" % "0.8.0"
+    )
+  ).dependsOn(core)
 
 lazy val defaultScalacOptions = Seq(
   "-Xfatal-warnings",
@@ -17,7 +22,8 @@ lazy val defaultScalacOptions = Seq(
 )
 
 lazy val defaultLibraryDependencies = Seq(
-  "org.typelevel" %% "macro-compat" % "1.1.1"
+  "org.typelevel" %% "macro-compat" % "1.1.1",
+  "com.chuusai" %% "shapeless" % "2.3.2"
 ) ++ defaultTestDependencies
 
 lazy val macroSettings = Seq(
