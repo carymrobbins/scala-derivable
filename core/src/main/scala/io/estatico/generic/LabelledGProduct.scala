@@ -1,6 +1,6 @@
 package io.estatico.generic
 
-trait LabelledGProduct[A] { type Repr }
+trait LabelledGProduct[A] extends GProduct[A]
 
 object LabelledGProduct {
 
@@ -15,9 +15,4 @@ object LabelledGProduct {
   def instance[A, R]: Aux[A, R] = _instance.asInstanceOf[Aux[A, R]]
 
   private val _instance = new LabelledGProduct[Any] { type Repr = Any }
-}
-
-object GField {
-  type Type[K, V] = V with Key[K]
-  trait Key[K]
 }

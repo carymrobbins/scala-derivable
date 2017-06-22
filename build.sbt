@@ -22,8 +22,7 @@ lazy val defaultScalacOptions = Seq(
 )
 
 lazy val defaultLibraryDependencies = Seq(
-  "org.typelevel" %% "macro-compat" % "1.1.1",
-  "com.chuusai" %% "shapeless" % "2.3.2"
+  "org.typelevel" %% "macro-compat" % "1.1.1"
 ) ++ defaultTestDependencies
 
 lazy val macroSettings = Seq(

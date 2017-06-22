@@ -20,9 +20,12 @@ private[generic] final class DeriveLabelledGProductMacros(val c: blackbox.Contex
         $clsDef
         object ${clsDef.name.toTermName} {
           ..${derivedInstances(clsDef)}
-        } """ case List(
-    clsDef: ClassDef,
-    q"object $objName extends { ..$objEarlyDefs } with ..$objParents { $objSelf => ..$objDefs }"
+        }
+      """
+
+    case List(
+      clsDef: ClassDef,
+      q"object $objName extends { ..$objEarlyDefs } with ..$objParents { $objSelf => ..$objDefs }"
     ) =>
       q"""
         $clsDef
@@ -46,9 +49,15 @@ private[generic] final class DeriveLabelledGProductMacros(val c: blackbox.Contex
       val name = TermName(s"isGNelLabelled$i")
       val f +: fs = fields.takeRight(i)
       val gHead = f.tpt
+      val gHeadLabel = f.name.decodedName.toString.trim
       val gTail = mkGList(fs)
-      val retType = tq"_root_.io.estatico.generic.IsGNel.Aux[$clsName, $gHead, $gTail]"
-      val retVal  = q"_root_.io.estatico.generic.IsGNel.instance(_.${f.name}.asInstanceOf[$gHead])"
+      val retType = tq"_root_.io.estatico.generic.IsGNel.Labelled.Aux[$clsName, $gHead, $gTail]"
+      val retVal  = q"""
+        _root_.io.estatico.generic.IsGNel.Labelled.instance(
+          _.${f.name}.asInstanceOf[$gHead],
+          $gHeadLabel
+        )
+      """
       q"implicit val $name: $retType = $retVal"
     }
     val gProd = {
@@ -60,16 +69,11 @@ private[generic] final class DeriveLabelledGProductMacros(val c: blackbox.Contex
     gNels :+ gProd
   }
 
-  private def mkFieldType(field: ValDef): Tree = {
-    val name = internal.constantType(Constant(field.name.decodedName.toString.trim))
-    tq"_root_.io.estatico.generic.GField[$name, ${field.tpt}]"
-  }
-
   private def mkGList(fields: List[ValDef]): Tree = {
     fields.foldRight(
       tq"_root_.io.estatico.generic.GNil": Tree
     )((f, acc) =>
-      tq"_root_.io.estatico.generic.#:[${mkFieldType(f)}, $acc]"
+      tq"_root_.io.estatico.generic.#:[${f.tpt}, $acc]"
     )
   }
 }

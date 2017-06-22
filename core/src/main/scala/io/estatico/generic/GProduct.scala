@@ -47,6 +47,28 @@ object IsGNel {
     def tail(a: GList.Of[A, Head #: Tail]): GList.Of[A, Tail] = a.asInstanceOf[GList.Of[A, Tail]]
   }
 
+  trait Labelled[A] extends IsGNel[A] {
+    def headLabel: String
+  }
+
+  object Labelled {
+
+    type Aux[A, H, T <: GList] = Labelled[A] { type Head = H ; type Tail = T }
+
+    def apply[A](implicit ev: Labelled[A]): Labelled[A] = ev
+
+    def instance[A, H, T <: GList](
+      h: GList.Of[A, H #: T] => H,
+      hLabel: String
+    ): Aux[A, H, T] = new Labelled[A] {
+      type Head = H
+      type Tail = T
+      def headLabel: String = hLabel
+      def head(a: GList.Of[A, H #: T]): H = h(a)
+      def tail(a: GList.Of[A, H #: T]): GList.Of[A, T] = a.asInstanceOf[GList.Of[A, T]]
+    }
+  }
+
   object ops {
 
     /**
@@ -54,6 +76,10 @@ object IsGNel {
      * with implicit ev to obtain the appropriate type params.
      */
     implicit final class IsGNelOps[A](val repr: A) extends AnyVal {
+
+      def headLabel[AA, H, T <: GList](
+        implicit labelled: Labelled.Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
+      ): String = labelled.headLabel
 
       def head[AA, H, T <: GList](
         implicit isGNel: Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
