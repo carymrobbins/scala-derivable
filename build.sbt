@@ -6,9 +6,14 @@ lazy val core = module("core")
 lazy val tests = module("tests")
   .settings(
     libraryDependencies ++= Seq(
-      "io.circe" %% "circe-core" % "0.8.0"
+      "io.circe" %% "circe-core"    % "0.8.0",
+      "io.circe" %% "circe-generic" % "0.8.0"
     )
   ).dependsOn(core)
+
+lazy val benchmark = module("benchmark")
+  .enablePlugins(JmhPlugin)
+  .dependsOn(tests)
 
 lazy val defaultScalacOptions = Seq(
   "-Xfatal-warnings",
@@ -35,7 +40,8 @@ lazy val macroSettings = Seq(
 
 lazy val defaultTestDependencies = Seq(
   "org.scalacheck" %% "scalacheck" % "1.13.4",
-  "org.scalatest" %% "scalatest" % "3.0.0"
+  "org.scalatest" %% "scalatest" % "3.0.0",
+  "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % "1.1.5"
 ).map(_ % "test")
 
 def applyDefaultSettings(project: Project) = project.settings(
