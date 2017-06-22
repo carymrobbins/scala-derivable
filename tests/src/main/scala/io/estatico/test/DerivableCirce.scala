@@ -2,7 +2,7 @@ package io.estatico.test
 
 import io.circe._
 import io.estatico.generic._
-import io.estatico.generic.IsGNel.ops._
+import io.estatico.generic.IsGCons.ops._
 
 object DerivableCirce {
 
@@ -26,11 +26,11 @@ object DerivableCirce {
     ObjectEncoder[GList.Of[A, L]].encodeObject(LabelledGProduct.to[A](a))
   )
 
-  implicit def gNelEnc[A, H, T <: GList](
+  implicit def gConsEnc[A, H, T <: GList](
     implicit
     hEnc: Encoder[H],
     tEnc: ObjectEncoder[GList.Of[A, T]],
-    isGNel: IsGNel.Labelled.Aux[A, H, T]
+    isGCons: IsGCons.Labelled.Aux[A, H, T]
   ): ObjectEncoder[GList.Of[A, H #: T]] = ObjectEncoder(a =>
     (a.headLabel, hEnc.apply(a.head)) +: tEnc.encodeObject(a.tail)
   )

@@ -45,13 +45,13 @@ private[generic] final class DeriveGProductMacros(val c: blackbox.Context) {
       case v: ValDef if v.mods.hasFlag(Flag.PARAMACCESSOR) && !v.mods.hasFlag(Flag.PRIVATE) => v
     }
     val len = fields.length
-    val gNels = (len to 1 by -1).map { i =>
-      val name = TermName(s"isGNel$i")
+    val gCons = (len to 1 by -1).map { i =>
+      val name = TermName(s"isGCons$i")
       val f +: fs = fields.takeRight(i)
       val gHead = f.tpt
       val gTail = mkGList(fs.map(_.tpt))
-      val retType = tq"_root_.io.estatico.generic.IsGNel.Aux[$clsName, $gHead, $gTail]"
-      val retVal  = q"_root_.io.estatico.generic.IsGNel.instance(_.${f.name})"
+      val retType = tq"_root_.io.estatico.generic.IsGCons.Aux[$clsName, $gHead, $gTail]"
+      val retVal  = q"_root_.io.estatico.generic.IsGCons.instance(_.${f.name})"
       q"implicit val $name: $retType = $retVal"
     }
     val gProd = {
@@ -60,7 +60,7 @@ private[generic] final class DeriveGProductMacros(val c: blackbox.Context) {
       val retVal  = q"_root_.io.estatico.generic.GProduct.instance"
       q"implicit val gProduct: $retType = $retVal"
     }
-    gNels :+ gProd
+    gCons :+ gProd
   }
 
   private def mkGList(types: List[Tree]): Tree = {

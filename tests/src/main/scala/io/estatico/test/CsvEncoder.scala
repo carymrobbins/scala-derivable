@@ -1,7 +1,7 @@
 package io.estatico.test
 
 import io.estatico.generic._
-import io.estatico.generic.IsGNel.ops._
+import io.estatico.generic.IsGCons.ops._
 
 trait CsvEncoder[A] {
   def encode(a: A): String
@@ -35,18 +35,18 @@ object CsvEncoder {
   def gProduct[A, H, T <: GList](
     implicit
     gProd: GProduct.Aux[A, H #: T],
-    isGNel: IsGNel.Aux[A, H, T],
+    isGCons: IsGCons.Aux[A, H, T],
     hEnc: CsvEncoder[H],
     tEnc: CsvEncoder[GList.Of[A, T]]
   ): CsvEncoder[A] = CsvEncoder.instance(a =>
-    gNel[A, H, T].encode(GProduct.to[A](a))
+    gCons[A, H, T].encode(GProduct.to[A](a))
   )
 
-  implicit def gNel[A, H, T <: GList](
+  implicit def gCons[A, H, T <: GList](
     implicit
     hEnc: CsvEncoder[H],
     tEnc: CsvEncoder[GList.Of[A, T]],
-    isGNel: IsGNel.Aux[A, H, T]
+    isGCons: IsGCons.Aux[A, H, T]
   ): CsvEncoder[GList.Of[A, H #: T]] = CsvEncoder.instance { a =>
     hEnc.encode(a.head) + ',' + tEnc.encode(a.tail)
   }
@@ -54,9 +54,9 @@ object CsvEncoder {
   implicit def gSingle[A, H](
     implicit
     hEnc: CsvEncoder[H],
-    isGNel: IsGNel.Aux[A, H, GNil]
-  ): CsvEncoder[GList.Of[A, H #: GNil]] = CsvEncoder.instance { nel =>
-    hEnc.encode(isGNel.head(nel))
+    isGCons: IsGCons.Aux[A, H, GNil]
+  ): CsvEncoder[GList.Of[A, H #: GNil]] = CsvEncoder.instance { a =>
+    hEnc.encode(a.head)
   }
 
   def derive[A](implicit ev: Derived[A]): CsvEncoder[A] = ev
@@ -69,15 +69,15 @@ object CsvEncoder {
     implicit def derivedGSingle[A, H](
       implicit
       gProd: GProduct.Aux[A, H #: GNil],
-      isGNel: IsGNel.Aux[A, H, GNil],
+      isGCons: IsGCons.Aux[A, H, GNil],
       hEnc: CsvEncoder[H]
     ): Derived[A] = cast(gSingle[A, H])
 
     /** For products with arity >= 2 */
-    implicit def derivedGNel[A, H, T <: GList](
+    implicit def derivedGCons[A, H, T <: GList](
       implicit
       gProd: GProduct.Aux[A, H #: T],
-      isGNel: IsGNel.Aux[A, H, T],
+      isGCons: IsGCons.Aux[A, H, T],
       hEnc: CsvEncoder[H],
       tEnc: CsvEncoder[GList.Of[A, T]]
     ): Derived[A] = cast(gProduct[A, H, T])

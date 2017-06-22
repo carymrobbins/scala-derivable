@@ -25,29 +25,29 @@ sealed trait #:[H, T <: GList] extends GList
 
 sealed trait GNil extends GList
 
-trait IsGNel[A] {
+trait IsGCons[A] {
   type Head
   type Tail <: GList
   def head(a: GList.Of[A, Head #: Tail]): Head
   def tail(a: GList.Of[A, Head #: Tail]): GList.Of[A, Tail]
 }
 
-object IsGNel {
+object IsGCons {
 
-  type Aux[A, H, T <: GList] = IsGNel[A] { type Head = H ; type Tail = T }
+  type Aux[A, H, T <: GList] = IsGCons[A] { type Head = H ; type Tail = T }
 
-  def apply[A](implicit ev: IsGNel[A]): Aux[A, ev.Head, ev.Tail] = ev
+  def apply[A](implicit ev: IsGCons[A]): Aux[A, ev.Head, ev.Tail] = ev
 
   def instance[A, H, T <: GList](
     h: GList.Of[A, H #: T] => H
-  ): Aux[A, H, T] = new IsGNel[A] {
+  ): Aux[A, H, T] = new IsGCons[A] {
     type Head = H
     type Tail = T
     def head(a: GList.Of[A, Head #: Tail]): Head = h(a)
     def tail(a: GList.Of[A, Head #: Tail]): GList.Of[A, Tail] = a.asInstanceOf[GList.Of[A, Tail]]
   }
 
-  trait Labelled[A] extends IsGNel[A] {
+  trait Labelled[A] extends IsGCons[A] {
     def headLabel: String
   }
 
@@ -75,19 +75,19 @@ object IsGNel {
      * Type inference is weird when extending methods for A, so we have to do some type param trickery
      * with implicit ev to obtain the appropriate type params.
      */
-    implicit final class IsGNelOps[A](val repr: A) extends AnyVal {
+    implicit final class IsGConsOps[A](val repr: A) extends AnyVal {
 
       def headLabel[AA, H, T <: GList](
         implicit labelled: Labelled.Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
       ): String = labelled.headLabel
 
       def head[AA, H, T <: GList](
-        implicit isGNel: Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
-      ): H = isGNel.head(ev(repr))
+        implicit isGCons: Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
+      ): H = isGCons.head(ev(repr))
 
       def tail[AA, H, T <: GList](
-        implicit isGNel: Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
-      ): GList.Of[AA, T] = isGNel.tail(ev(repr))
+        implicit isGCons: Aux[AA, H, T], ev: A =:= GList.Of[AA, H #: T]
+      ): GList.Of[AA, T] = isGCons.tail(ev(repr))
     }
   }
 }
