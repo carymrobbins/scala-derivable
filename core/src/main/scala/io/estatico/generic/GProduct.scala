@@ -38,13 +38,15 @@ object IsGCons {
 
   def apply[A](implicit ev: IsGCons[A]): Aux[A, ev.Head, ev.Tail] = ev
 
+  def Aux[A, H, T <: GList](implicit ev: Aux[A, H, T]): Aux[A, H, T] = ev
+
   def instance[A, H, T <: GList](
     h: GList.Of[A, H #: T] => H
   ): Aux[A, H, T] = new IsGCons[A] {
     type Head = H
     type Tail = T
-    def head(a: GList.Of[A, Head #: Tail]): Head = h(a)
-    def tail(a: GList.Of[A, Head #: Tail]): GList.Of[A, Tail] = a.asInstanceOf[GList.Of[A, Tail]]
+    def head(a: GList.Of[A, H #: T]): H = h(a)
+    def tail(a: GList.Of[A, H #: T]): GList.Of[A, T] = a.asInstanceOf[GList.Of[A, T]]
   }
 
   trait Labelled[A] extends IsGCons[A] {
@@ -53,9 +55,11 @@ object IsGCons {
 
   object Labelled {
 
+    def apply[A](implicit ev: Labelled[A]): Labelled[A] = ev
+
     type Aux[A, H, T <: GList] = Labelled[A] { type Head = H ; type Tail = T }
 
-    def apply[A](implicit ev: Labelled[A]): Labelled[A] = ev
+    def Aux[A, H, T <: GList](implicit ev: Aux[A, H, T]): Aux[A, H, T] = ev
 
     def instance[A, H, T <: GList](
       h: GList.Of[A, H #: T] => H,

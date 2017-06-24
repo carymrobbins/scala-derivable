@@ -82,7 +82,6 @@ object CsvEncoder {
       tEnc: CsvEncoder[GList.Of[A, T]]
     ): Derived[A] = cast(gProduct[A, H, T])
 
-
     def cast[A, AA <: A](x: CsvEncoder[AA]): Derived[A] = x.asInstanceOf[Derived[A]]
   }
 }
