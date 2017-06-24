@@ -74,6 +74,20 @@ IsGCons.Aux[Foo, String, GNil].tail(t)
 // GList.Of[Foo, GNil] = Foo(1,hey)
 ```
 
+You can also access labels (analogous to shapeless' `LabelledGeneric`) using
+`LabelledGProduct` -
+
+```scala
+@DeriveLabelledGProduct
+case class Foo(a: Int, b: String)
+
+IsGCons.Labelled.Aux[Foo, Int, String #: GNil].headLabel
+// String = a
+
+IsGCons.Labelled.Aux[Foo, String, GNil].headLabel
+// String = b
+```
+
 See [CsvEncoder](/tests/src/main/scala/io/estatico/test/CsvEncoder.scala)
 and [DerivableCirce](/tests/src/main/scala/io/estatico/test/DerivableCirce.scala)
 for examples of using `GProduct` and `LabelledGProduct`.
